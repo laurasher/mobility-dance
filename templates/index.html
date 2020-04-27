@@ -4,18 +4,19 @@
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <style>
     body {
       font-family:"avenir next", Arial, sans-serif;
       font-size: 12px;
-      color: #696969;
+      color: white;
+      background: black;
     }
 
     #play-button {
-      position: absolute;
-      top: 140px;
-      left: 50px;
-      background: black;
+      margin-left: 80px;
+      margin-top: 20px;
+      background: gray;
       padding-right: 26px;
       border-radius: 3px;
       border: none;
@@ -27,9 +28,37 @@
       height: 30px;
     }
 
+    .mobility-button {
+      display: inline;
+      float: left;
+      background: gray;
+      padding-right: 26px;
+      border-radius: 3px;
+      border: none;
+      color: white;
+      margin: 0;
+      padding: 0 12px;
+      width: 60px;
+      cursor: pointer;
+      height: 30px;
+      width: auto;
+      margin-left: 20px;
+      font-size: 10px;
+    }
+
+    .on{
+      background-color: #696969;
+      border: solid;
+      border-color: white
+    }
+
     #play-button:hover {
       background-color: #696969;
-    }    
+    }  
+
+    .gray-button:hover {
+      background-color: #696969;
+    }   
     
     .ticks {
       font-size: 10px;
@@ -48,7 +77,7 @@
     }
 
     .track-inset {
-      stroke: #dcdcdc;
+      stroke: lightgray;
       stroke-width: 8px;
     }
 
@@ -65,14 +94,71 @@
       stroke-opacity: 0.5;
       stroke-width: 1.25px;
     }
+    #title{
+      font-size: 36px;
+      font-family:"avenir next", Arial, sans-serif;
+      margin-left: 80px;
+    }
+    #stay-at-home{
+      background: red;
+      float: left;
+      height: 300px;
+      width: 250px;
+      margin-left: 50px;
+      display: inline;
+    }
+    #vis{
+      float: left;
+      display: inline;
+    }
+    #mobility-buttons{
+      margin-left: 80px;
+
+    }
+    #play-button-container{
+      margin-top: 60px;
+      margin-left: 100px;
+    }
   </style>
 </head>
 
 <body>
+<p id="title">The Social Distancing Dance</p>
 <div id="vis">
-  <button id="play-button">Play</button>
+<div id="mobility-buttons">
+    <button id="transit-button" class="mobility-button on">Transit</button>
+    <button id="work-button" class="mobility-button on">Work</button>
+    <button id="residential-button" class="mobility-button on">Residential</button>
+    <button id="grocery-button" class="mobility-button on">Grocery</button>
+    <button id="retail-button" class="mobility-button on">Retail</button>
+    <button id="parks-button" class="mobility-button on">Parks</button>
+</div>  
+<div id="play-button-container">
+  <button id="play-button" class="gray-button">Play</button>
+</div>
+</div>
+<div id="stay-at-home">
 </div>
 <script>
+
+$("#transit-button").click(function(){
+  $("#transit-button").toggleClass("on");
+});
+$("#work-button").click(function(){
+  $("#work-button").toggleClass("on");
+});
+$("#residential-button").click(function(){
+  $("#residential-button").toggleClass("on");
+});
+$("#grocery-button").click(function(){
+  $("#grocery-button").toggleClass("on");
+});
+$("#retail-button").click(function(){
+  $("#retail-button").toggleClass("on");
+});
+$("#parks-button").click(function(){
+  $("#parks-button").toggleClass("on");
+});
 
 var formatDateIntoYear = d3.timeFormat("%Y");
 //var formatDate = d3.timeFormat("%m/%d/%y");
@@ -81,9 +167,9 @@ var formatDate = d3.timeFormat("%Y-%m-%d");
 var startDate = new Date("2020-02-15"),
     endDate = new Date("2020-04-11");
 
-var margin = {top:50, right:50, bottom:0, left:50},
-    width = 1200 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var margin = {top:80, right:50, bottom:0, left:100},
+    width = 1000 - margin.left - margin.right,
+    height = 800 - margin.top - margin.bottom;
 
 var svg = d3.select("#vis")
     .append("svg")
@@ -117,13 +203,13 @@ svg.append("g")
 // Add Y axis
 var y = d3.scaleLinear()
   .domain([0, -50])
-  .range([ 0, height]);
+  .range([ 0, height/3]);
 svg.append("g")
   //.call(d3.axisLeft(y));
 
 var slider = svg.append("g")
     .attr("class", "slider")
-    .attr("transform", "translate(" + margin.left + "," + height/5 + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 slider.append("line")
     .attr("class", "track")
@@ -137,7 +223,6 @@ slider.append("line")
         .on("start.interrupt", function() { slider.interrupt(); })
         .on("start drag", function() {
           currentValue = d3.event.x;
-          console.log('call update here ')
           update(x_slider.invert(currentValue)); 
         })
     );
@@ -163,16 +248,33 @@ var label = slider.append("text")
     .attr("class", "label")
     .attr("text-anchor", "middle")
     .text(formatDate(startDate))
+    .style("fill", "white")
     .attr("transform", "translate(0," + (-25) + ")")
 
  
 ////////// plot //////////
 
 var dataset;
+var stay_at_home = []
+
+d3.csv('./static/stay_at_home.csv', function(data) {
+    for (var i = 0; i < data.length; i++) {
+        //console.log(data[i].state);
+        //console.log(data[i].order_date);
+        console.log({ 'state': data[i].state,
+                            'order_date': data[i].order_date
+                          })
+        stay_at_home.push({ 'state': data[i].state,
+                            'order_date': data[i].order_date
+                          })
+    }
+});
+
+ploty = margin.top + height/4
 
 var plot = svg.append("g")
     .attr("class", "plot")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + ploty + ")");
   
   function filter_data(_date, data){
     region = "#69b3a2";
@@ -184,7 +286,8 @@ var plot = svg.append("g")
     data_filt = data_filt.filter(x => x.sub_region_2 != '')
     data_filt = data_filt.filter(x => x.date==dates[date_ind])
     //data_filt = _.sortBy(data_filt, 'sub_region_1')
-    console.log(data_filt)
+    //console.log(data_filt)
+    //console.log(stay_at_home)
 
     data_obj = data_filt.map( function (x) {
         if (x.retail_and_recreation_percent_change_from_baseline == ""){
@@ -205,27 +308,68 @@ var plot = svg.append("g")
         if (x.residential_percent_change_from_baseline == ""){
             x.residential_percent_change_from_baseline = 0
         }
+
+        
+        avg_mobility_change = []
+        if ($('#transit-button').hasClass('on')) {avg_mobility_change.push(x.transit_stations_percent_change_from_baseline)}
+        if ($('#work-button').hasClass('on')) {avg_mobility_change.push(x.workplaces_percent_change_from_baseline)}
+        if ($('#residential-button').hasClass('on')) {avg_mobility_change.push(x.residential_percent_change_from_baseline)}
+        if ($('#grocery-button').hasClass('on')) {avg_mobility_change.push(x.grocery_and_pharmacy_percent_change_from_baseline)}
+        if ($('#retail-button').hasClass('on')) {avg_mobility_change.push(x.retail_and_recreation_percent_change_from_baseline)}
+        if ($('#parks-button').hasClass('on')) {avg_mobility_change.push(x.parks_percent_change_from_baseline)}
+
+        var total = 0
+        avg_mobility_change.forEach(function (x) {
+            total += parseInt(x)        
+        });
+
+        avg_mobility_change = total / avg_mobility_change.length
+        
+        //console.log("Manual with buttons ", avg_mobility_change)
+        /*
         avg_mobility_change = (
                  parseInt(x.retail_and_recreation_percent_change_from_baseline) + 
-                 //parseInt(x.grocery_and_pharmacy_percent_change_from_baseline) +
-                 //parseInt(x.parks_percent_change_from_baseline) + 
+                 parseInt(x.grocery_and_pharmacy_percent_change_from_baseline) +
+                 parseInt(x.parks_percent_change_from_baseline) + 
                  parseInt(x.transit_stations_percent_change_from_baseline) + 
-                 parseInt(x.workplaces_percent_change_from_baseline)) / 3
-                 //parseInt(x.residential_percent_change_from_baseline))/6;
-        // Southeast
-        if (  ['West Virginia', 'Virginia', 'Kentucky', 'Tennessee', 'North Carolina', 'South Carolina', 'Georgia', 
-          'Alabama', 'Mississippi', 'Arkansas', 'Louisiana', 'Florida'].includes(x.sub_region_1) ){
-          region = 'orange';
-        } 
+                 parseInt(x.workplaces_percent_change_from_baseline) +
+                 parseInt(x.residential_percent_change_from_baseline)) / 6;
+        */
+        //console.log("Old way ", avg_mobility_change)
+
         // Northeast
-        else if (  ['Maine', 'Massachusetts', 'Rhode Island', 'Connecticut', 'New Hampshire', 'Vermont', 'New York', 'Pennsylvania', 'New Jersey',
-          'Delaware', 'Maryland'].includes(x.sub_region_1) ){
-          region = 'red';
+        if (  ['Maine', 'Massachusetts', 'Rhode Island', 'Connecticut', 'New Hampshire', 'Vermont', 
+          'New York', 'Pennsylvania', 'New Jersey', 'Delaware', 'Maryland'].includes(x.sub_region_1) ){
+          //region = '#948718';
+          region = '#7fa998'
+          //region = 'red'
         }
+        // Southeast
+        else if (  ['West Virginia', 'Virginia', 'Kentucky', 'Tennessee', 'North Carolina', 'South Carolina', 'Georgia', 
+          'Alabama', 'Mississippi', 'Arkansas', 'Louisiana', 'Florida'].includes(x.sub_region_1) ){
+          //region = '#948C43';
+          region = '#f1f1b0'
+          //region = 'blue'
+        } 
         // West
         else if (  ['Colorado', 'Wyoming', 'Montana', 'Idaho', 'Washington', 'Oregon', 'Utah', 'Nevada', 
           'California', 'Alaska', 'Hawaii'].includes(x.sub_region_1) ){
-          region = 'blue';
+          region = '#948E57';
+          //region = 'green'
+        }
+        // Midwest
+        else if (  ['Ohio', 'Indiana', 'Michigan', 'Illinois', 'Missouri', 'Wisconsin', 'Minnesota', 'Iowa', 
+          'Kansas', 'Nebraska', 'South Dakota', 'North Dakota'].includes(x.sub_region_1) ){
+          //region = '#94906C';
+          region = '#df8543'
+          //region = 'purple'
+        }
+        // Southwest
+        else if (  ['Texas', 'Oklahoma', 'New Mexico', 'Arizona'].includes(x.sub_region_1) ){
+          //region = '#94927E';
+          region = '#9d2503'
+          //region = 'white'
+
         } else {
           region = "#69b3a2";
         }
@@ -246,12 +390,12 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
 
   var dots = plot.selectAll(".scatterdot")
     .data(dataset);
-
+  /*
   dots.enter()
     .append("circle")
     .attr("class", "scatterdot")
     .attr("r", 1.5)
-    .style("fill", function (d) { return d.region; })
+    .style("fill", function (d) { return d.region; })*/
 
   //update all circles to new positions
   dots.transition()
@@ -337,10 +481,30 @@ function update(h) {
     .attr("x", x_slider(h))
     .text(formatDate(h));
 
+  d = formatDate(h).toString()
+
+  _ind = stay_at_home.map(x=>x.order_date).indexOf(d)
+  if (_ind > 0){
+    stay_at_home_state = stay_at_home[_ind].state
+    console.log('DRAW NEW')
+    console.log(stay_at_home_state)
+    drawStayAtHomeDiv([stay_at_home_state])
+  }
+
   // filter data set and redraw plot
-  new_data = filter_data((h), dataset)
-  console.log(new_data.length)
+  new_data = filter_data(h, dataset)
   drawPlot(new_data);
+}
+
+function drawStayAtHomeDiv(state){
+  d3.select('#stay-at-home')
+    .selectAll('div')
+    .data(state)
+    .enter()
+    .append('div')
+    .text(function(d){
+      return d;
+    });
 }
 
 </script>
