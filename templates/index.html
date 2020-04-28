@@ -74,6 +74,7 @@
 
     .ticks {
       font-size: 10px;
+      color: white;
     }
 
     .track,
@@ -153,12 +154,12 @@
 <text id='loading-icon'>Loading...</text>
 <div id="vis">
 <div id="mobility-buttons">
-    <button id="transit-button" class="mobility-button on">Transit</button>
+    <button id="transit-button" class="mobility-button">Transit</button>
     <button id="work-button" class="mobility-button on">Work</button>
-    <button id="residential-button" class="mobility-button on">Residential</button>
+    <button id="residential-button" class="mobility-button">Residential</button>
     <button id="grocery-button" class="mobility-button on">Grocery</button>
-    <button id="retail-button" class="mobility-button on">Retail</button>
-    <button id="parks-button" class="mobility-button on">Parks</button>
+    <button id="retail-button" class="mobility-button">Retail</button>
+    <button id="parks-button" class="mobility-button">Parks</button>
 </div>
 <div id="text">
   Select one or more mobility categories to include in the displayed average. Each point represents one U.S. county.
@@ -248,8 +249,8 @@ var targetValue = width;
 
 var playButton = d3.select("#play-button");
 
-//var x_slider = d3.scaleTime()
-var x_slider = d3.scaleLinear()
+var x_slider = d3.scaleTime()
+//var x_slider = d3.scaleLinear()
     .domain([startDate, endDate])
     .range([0, targetValue])
     .clamp(true);
@@ -292,14 +293,15 @@ slider.append("line")
     );
 
 slider.insert("g", ".track-overlay")
-    //.attr("class", "ticks")
+    .attr("class", "ticks")
     .attr("transform", "translate(0," + 18 + ")")
   .selectAll("text")
-    //.data(x_slider.ticks(10))
+    .data(x_slider.ticks(10))
     .enter()
     .append("text")
     .attr("x", x_slider)
     .attr("y", 10)
+    .style("fill", "white")
     .attr("text-anchor", "middle")
     .text(function(d) { return formatDate(d); });
 
@@ -323,15 +325,40 @@ var stay_at_home = []
 
 d3.csv('./static/stay_at_home.csv', function(data) {
     for (var i = 0; i < data.length; i++) {
-        //console.log(data[i].state);
-        //console.log(data[i].order_date);
-        console.log({ 'state': data[i].state,
-                            'order_date': data[i].order_date
-                          })
         stay_at_home.push({ 'state': data[i].state,
-                            'order_date': data[i].order_date
+                            'order_date': data[i].order_date,
+                            'stabr': data[i].stabr,
+                            'offset': parseInt(data[i].offset)
                           })
     }
+    console.log(stay_at_home.map(x=>new Date(x.order_date)))
+    slider.insert("g", ".track-overlay")
+      .attr("class", "ticks-lines")
+      .attr("transform", "translate(0," + -18 + ")")
+    .selectAll("circle")
+      .data(stay_at_home.map(x=>new Date(x.order_date)))
+      .enter()
+      .append("circle")
+      .attr("cx", x_slider)
+      .attr("cy", 10)
+      .attr("r", 2)
+      .style("fill", "white")
+      .attr("text-anchor", "middle")
+      //.text(function(d) { return formatDate(d); });
+
+    slider.insert("g", ".track-overlay")
+      .attr("class", "ticks")
+      .attr("transform", "translate(0," + -25 + ")")
+    .selectAll("text")
+      .data(stay_at_home.map(x=>new Date(x.order_date)))
+      .enter()
+      .append("text")
+      .attr("x", x_slider)
+      .attr("y", function(d, i) { return 10 - 10*stay_at_home[i].offset; })
+      .attr("font-size", "7px")
+      .style("fill", "white")
+      .attr("text-anchor", "middle")
+      .text(function(d, i) { return stay_at_home[i].stabr; });
 });
 
 ploty = margin.top + height/3.5
@@ -351,7 +378,7 @@ var plot = svg.append("g")
     data_filt = data_filt.filter(x => x.date==dates[date_ind])
     //data_filt = _.sortBy(data_filt, 'sub_region_1')
     //console.log(data_filt)
-    //console.log(stay_at_home)
+    console.log(stay_at_home)
 
     data_obj = data_filt.map( function (x) {
         if (x.retail_and_recreation_percent_change_from_baseline == ""){
