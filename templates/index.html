@@ -13,9 +13,12 @@
       background: black;
     }
 
+    input:focus {
+      outline:none;
+    }
     #play-button {
       margin-left: 80px;
-      margin-top: 20px;
+      margin-top: 10px;
       background: gray;
       padding-right: 26px;
       border-radius: 3px;
@@ -31,10 +34,10 @@
     .mobility-button {
       display: inline;
       float: left;
-      background: gray;
+      background: black;
       padding-right: 26px;
       border-radius: 3px;
-      border: none;
+      border: solid;
       color: white;
       margin: 0;
       padding: 0 12px;
@@ -44,22 +47,31 @@
       width: auto;
       margin-left: 20px;
       font-size: 10px;
+      border-width: thin;
+    }
+
+    .mobility-button:hover {
+      background-color: #696969;
+    } 
+    .mobility-button:focus {
+      outline:none;
     }
 
     .on{
-      background-color: #696969;
+      background-color: white;
       border: solid;
-      border-color: white
+      color: black;
+      border-color: white;
+      border-width: thin !important;
     }
 
     #play-button:hover {
       background-color: #696969;
     }  
+    #play-button:focus {
+      outline:none;
+    }
 
-    .gray-button:hover {
-      background-color: #696969;
-    }   
-    
     .ticks {
       font-size: 10px;
     }
@@ -78,7 +90,7 @@
 
     .track-inset {
       stroke: lightgray;
-      stroke-width: 8px;
+      stroke-width: 4px;
     }
 
     .track-overlay {
@@ -97,7 +109,7 @@
     #title{
       font-size: 36px;
       font-family:"avenir next", Arial, sans-serif;
-      margin-left: 80px;
+      margin-left: 100px;
     }
     #stay-at-home{
       background: red;
@@ -117,14 +129,28 @@
 
     }
     #play-button-container{
-      margin-top: 60px;
+      margin-top: 20px;
       margin-left: 100px;
+    }
+    #text{
+      color: white;
+      display: inline-block;
+      margin-left: 100px;
+      margin-top: 20px;
+    }
+    #loading-icon{
+      margin-left: 40%;
+      margin-top: 40%;
+      font-size: 20px;
+      color: white;
+      display: none;
     }
   </style>
 </head>
 
 <body>
 <p id="title">The Social Distancing Dance</p>
+<text id='loading-icon'>Loading...</text>
 <div id="vis">
 <div id="mobility-buttons">
     <button id="transit-button" class="mobility-button on">Transit</button>
@@ -133,14 +159,24 @@
     <button id="grocery-button" class="mobility-button on">Grocery</button>
     <button id="retail-button" class="mobility-button on">Retail</button>
     <button id="parks-button" class="mobility-button on">Parks</button>
-</div>  
+</div>
+<div id="text">
+  Select one or more mobility categories to include in the displayed average. Each point represents one U.S. county.
+</div>
 <div id="play-button-container">
-  <button id="play-button" class="gray-button">Play</button>
+  <button id="play-button">Play</button>
 </div>
 </div>
 <div id="stay-at-home">
 </div>
 <script>
+/*
+function loadingFade() {           
+  $('#loading-icon').animate({opacity:'1'}, 500);
+  $('#loading-icon').animate({opacity:'0.4'}, 500, loadingFade);
+}
+loadingFade();
+*/
 
 $("#transit-button").click(function(){
   if ($("#transit-button").hasClass('on') && ($('.mobility-button.on').length > 1)) {
@@ -195,7 +231,7 @@ var formatDate = d3.timeFormat("%Y-%m-%d");
 var startDate = new Date("2020-02-15"),
     endDate = new Date("2020-04-11");
 
-var margin = {top:80, right:50, bottom:0, left:100},
+var margin = {top:80, right:50, bottom:0, left:110},
     width = 1000 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
@@ -298,7 +334,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
     }
 });
 
-ploty = margin.top + height/4
+ploty = margin.top + height/3.5
 
 var plot = svg.append("g")
     .attr("class", "plot")
@@ -415,6 +451,19 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
   //data_filt = filter_data(0, dataset)
   data_filt = filter_data(new Date('2020-02-18'), dataset)
   console.log('------ DRAW FOR FIRST TIME')
+
+  var d1 = {date:"30-Apr-12",close:"53.98"};
+  var d2 = {date:"26-Apr-12",close:"89.70"};
+
+  plot.append("line")
+   .attr('stroke', 'white')
+   .attr('opacity', 0.6)
+   .attr('stroke-dasharray', 2,1)
+   .attr("stroke-width", 1)
+   .attr("x1", x_dots(0))
+   .attr("y1", y(0))
+   .attr("x2", x_dots(2770))
+   .attr("y2", y(0));
 
   var dots = plot.selectAll(".scatterdot")
     .data(dataset);
