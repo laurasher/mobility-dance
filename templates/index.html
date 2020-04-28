@@ -188,7 +188,6 @@ $("#transit-button").click(function(){
   })
 $("#work-button").click(function(){
   if ($("#work-button").hasClass('on') && ($('.mobility-button.on').length > 1)) {
-    console.log('REMOVE WORK')
     $("#work-button").removeClass('on') }
   else{
     $("#work-button").addClass('on')
@@ -291,7 +290,7 @@ slider.append("line")
           update(x_slider.invert(currentValue)); 
         })
     );
-
+/*
 slider.insert("g", ".track-overlay")
     .attr("class", "ticks")
     .attr("transform", "translate(0," + 18 + ")")
@@ -304,7 +303,7 @@ slider.insert("g", ".track-overlay")
     .style("fill", "white")
     .attr("text-anchor", "middle")
     .text(function(d) { return formatDate(d); });
-
+*/
 
 var handle = slider.insert("circle", ".track-overlay")
     .attr("class", "handle")
@@ -331,10 +330,10 @@ d3.csv('./static/stay_at_home.csv', function(data) {
                             'offset': parseInt(data[i].offset)
                           })
     }
-    console.log(stay_at_home.map(x=>new Date(x.order_date)))
     slider.insert("g", ".track-overlay")
       .attr("class", "ticks-lines")
-      .attr("transform", "translate(0," + -18 + ")")
+      .attr("transform", "translate(0," + 1 + ")")
+      .style("opacity", 0.8)
     .selectAll("circle")
       .data(stay_at_home.map(x=>new Date(x.order_date)))
       .enter()
@@ -342,22 +341,24 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .attr("cx", x_slider)
       .attr("cy", 10)
       .attr("r", 2)
+      .style("opacity", 0.8)
       .style("fill", "white")
       .attr("text-anchor", "middle")
       //.text(function(d) { return formatDate(d); });
 
     slider.insert("g", ".track-overlay")
       .attr("class", "ticks")
-      .attr("transform", "translate(0," + -25 + ")")
+      .attr("transform", "translate(0," + 15 + ")")
     .selectAll("text")
       .data(stay_at_home.map(x=>new Date(x.order_date)))
       .enter()
       .append("text")
       .attr("x", x_slider)
-      .attr("y", function(d, i) { return 10 - 10*stay_at_home[i].offset; })
+      .attr("y", function(d, i) { return 10 + 10*stay_at_home[i].offset; })
       .attr("font-size", "7px")
       .style("fill", "white")
       .attr("text-anchor", "middle")
+      .style("opacity", 0.8)
       .text(function(d, i) { return stay_at_home[i].stabr; });
 });
 
@@ -378,7 +379,7 @@ var plot = svg.append("g")
     data_filt = data_filt.filter(x => x.date==dates[date_ind])
     //data_filt = _.sortBy(data_filt, 'sub_region_1')
     //console.log(data_filt)
-    console.log(stay_at_home)
+    //console.log(stay_at_home)
 
     data_obj = data_filt.map( function (x) {
         if (x.retail_and_recreation_percent_change_from_baseline == ""){
@@ -484,8 +485,8 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
 
   plot.append("line")
    .attr('stroke', 'white')
-   .attr('opacity', 0.6)
-   .attr('stroke-dasharray', 2,1)
+   .attr('opacity', 0.9)
+   .attr('stroke-dasharray', 2,3)
    .attr("stroke-width", 1)
    .attr("x1", x_dots(0))
    .attr("y1", y(0))
