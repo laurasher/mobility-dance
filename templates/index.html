@@ -19,7 +19,8 @@
     #play-button {
       margin-left: 80px;
       margin-top: 10px;
-      background: gray;
+      /*background: gray;*/
+      background: black;
       padding-right: 26px;
       border-radius: 3px;
       border: none;
@@ -29,6 +30,9 @@
       width: 60px;
       cursor: pointer;
       height: 30px;
+      border: solid;
+      border-color: white;
+      border-width: thin !important;
     }
 
     .mobility-button {
@@ -91,7 +95,7 @@
 
     .track-inset {
       stroke: lightgray;
-      stroke-width: 4px;
+      stroke-width: 2px;
     }
 
     .track-overlay {
@@ -307,7 +311,7 @@ slider.insert("g", ".track-overlay")
 
 var handle = slider.insert("circle", ".track-overlay")
     .attr("class", "handle")
-    .attr("r", 9);
+    .attr("r", 6);
 
 var label = slider.append("text")  
     .attr("class", "label")
@@ -485,9 +489,9 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
 
   plot.append("line")
    .attr('stroke', 'white')
-   .attr('opacity', 0.9)
-   .attr('stroke-dasharray', 2,3)
-   .attr("stroke-width", 1)
+   .attr('opacity', 1)
+   //.attr('stroke-dasharray', 2,3)
+   .attr("stroke-width", 0.3)
    .attr("x1", x_dots(0))
    .attr("y1", y(0))
    .attr("x2", x_dots(2770))
