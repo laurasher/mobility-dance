@@ -1,46 +1,46 @@
-﻿state,order_date,stabr,offset
-California,2020-03-19,CA,0
-Arizona,2020-03-21,AZ,0
-Illinois,2020-03-21,IL,1
-New Jersey,2020-03-21,NJ,2
-New York,2020-03-22,NY,0
-Connecticut,2020-03-23,CT,0
-Louisiana,2020-03-23,LA,1
-Ohio,2020-03-23,OH,2
-Oregon,2020-03-23,OR,3
-Washington,2020-03-23,WA,4
-Delaware,2020-03-24,DE,0
-Indiana,2020-03-24,IN,1
-Massachusetts,2020-03-24,MA,2
-Michigan,2020-03-24,MI,3
-New Mexico,2020-03-24,NM,4
-Hawaii,2020-03-25,HI,0
-Idaho,2020-03-25,ID,1
-Vermont,2020-03-25,VT,2
-West Virginia,2020-03-25,WV,3
-Wisconsin,2020-03-25,WI,4
-Colorado,2020-03-26,CO,0
-Kentucky,2020-03-26,KY,1
-Minnesota,2020-03-27,MN,0
-Mississippi,2020-03-27,MS,1
-New Hampshire,2020-03-27,NH,2
-Alaska,2020-03-28,AK,0
-Rhode Island,2020-03-28,RI,1
-Wyoming,2020-03-28,WY,2
-Kansas,2020-03-30,KS,0
-Maryland,2020-03-30,MD,1
-North Carolina,2020-03-30,NC,2
-Utah,2020-03-30,UT,3
-Virginia,2020-03-30,VA,4
-Tennessee,2020-03-31,TN,0
-District of Columbia,2020-04-01,DC,0
-Nevada,2020-04-01,NV,1
-Pennsylvania,2020-04-01,PA,2
-Maine,2020-04-02,ME,0
-Texas,2020-04-02,TX,1
-Alabama,2020-04-03,AL,0
-Florida,2020-04-03,FL,1
-Georgia,2020-04-03,GA,2
-Missouri,2020-04-06,MO,0
-Montana,2020-04-06,MN,1
-South Carolina,2020-04-07,SC,0
+﻿state,order_date,stabr,offset,color
+California,3/19/20,CA,0,#948E57
+Arizona,3/21/20,AZ,1,#9d2503
+Illinois,3/21/20,IL,2,#df8543
+New Jersey,3/21/20,NJ,0,#7fa998
+New York,3/22/20,NY,0,#7fa998
+Connecticut,3/23/20,CT,0,#7fa998
+Louisiana,3/23/20,LA,4,#f1f1b0
+Ohio,3/23/20,OH,3,#df8543
+Oregon,3/23/20,OR,2,#948E57
+Washington,3/23/20,WA,1,#948E57
+Delaware,3/24/20,DE,0,#7fa998
+Indiana,3/24/20,IN,3,#df8543
+Massachusetts,3/24/20,MA,1,#7fa998
+Michigan,3/24/20,MI,4,#df8543
+New Mexico,3/24/20,NM,2,#9d2503
+Hawaii,3/25/20,HI,2,#948E57
+Idaho,3/25/20,ID,1,#948E57
+Vermont,3/25/20,VT,0,#7fa998
+West Virginia,3/25/20,WV,4,#f1f1b0
+Wisconsin,3/25/20,WI,3,#df8543
+Colorado,3/26/20,CO,0,#948E57
+Kentucky,3/26/20,KY,1,#f1f1b0
+Minnesota,3/27/20,MN,1,#df8543
+Mississippi,3/27/20,MS,2,#f1f1b0
+New Hampshire,3/27/20,NH,0,#7fa998
+Alaska,3/28/20,AK,1,#948E57
+Rhode Island,3/28/20,RI,0,#7fa998
+Wyoming,3/28/20,WY,2,#948E57
+Kansas,3/30/20,KS,2,#df8543
+Maryland,3/30/20,MD,0,#7fa998
+North Carolina,3/30/20,NC,3,#f1f1b0
+Utah,3/30/20,UT,1,#948E57
+Virginia,3/30/20,VA,4,#f1f1b0
+Tennessee,3/31/20,TN,0,#f1f1b0
+District of Columbia,4/1/20,DC,0,#7fa998
+Nevada,4/1/20,NV,2,#948E57
+Pennsylvania,4/1/20,PA,1,#7fa998
+Maine,4/2/20,ME,0,#7fa998
+Texas,4/2/20,TX,1,#9d2503
+Alabama,4/3/20,AL,0,#f1f1b0
+Florida,4/3/20,FL,1,#f1f1b0
+Georgia,4/3/20,GA,2,#f1f1b0
+Missouri,4/6/20,MO,1,#df8543
+Montana,4/6/20,MT,0,#948E57
+South Carolina,4/7/20,SC,0,#f1f1b0

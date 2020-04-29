@@ -164,6 +164,7 @@
     <button id="parks-button" class="mobility-button">Parks</button>
 </div>
 <div id="text">
+<!--<img style="width: auto; height: 50px; opacity: 0.7; margin-left: 0px;" src="./static/states.svg" alt="">-->
   Each point represents one U.S. county. Its height corresponds to change in mobility from baseline.<br>
   Select one or more mobility categories to include in the displayed average.
 </div>
@@ -328,13 +329,14 @@ var label = slider.append("text")
 
 var dataset;
 var stay_at_home = []
-var state_opacity = 0.6
+var state_opacity = 1
 d3.csv('./static/stay_at_home.csv', function(data) {
     for (var i = 0; i < data.length; i++) {
         stay_at_home.push({ 'state': data[i].state,
                             'order_date': data[i].order_date,
                             'stabr': data[i].stabr,
-                            'offset': parseInt(data[i].offset)
+                            'offset': parseInt(data[i].offset),
+                            'color' : data[i].color
                           })
     }
     slider.insert("g", ".track-overlay")
@@ -348,7 +350,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .attr("cx", x_slider)
       .attr("cy", 10)
       .attr("r", 2)
-      .style("opacity", state_opacity)
+      .style("opacity", 0.6)
       .style("fill", "white")
       .attr("text-anchor", "middle")
       //.text(function(d) { return formatDate(d); });
@@ -363,7 +365,8 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .attr("x", x_slider)
       .attr("y", function(d, i) { return 10 + 10*stay_at_home[i].offset; })
       .attr("font-size", "7px")
-      .style("fill", "white")
+      //.style("fill", "white")
+      .attr("fill", function(d, i) { return stay_at_home[i].color; })
       .attr("text-anchor", "middle")
       .style("opacity", state_opacity)
       .text(function(d, i) { return stay_at_home[i].stabr; });
