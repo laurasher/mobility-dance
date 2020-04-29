@@ -148,7 +148,6 @@
       margin-top: 60%;
       font-size: 20px;
       color: white;
-      display: none;
     }
   </style>
 </head>
@@ -176,7 +175,7 @@
 <div id="stay-at-home">
 </div>
 <script>
-/*
+
 function loadingFade() {           
   $('#loading-icon').animate({opacity:'1'}, 500);
   $('#loading-icon').animate({opacity:'0.4'}, 500, loadingFade);
@@ -185,7 +184,7 @@ function loadingFade() {
 loadingFade();
 
 setTimeout(function(){$('#loading-icon').remove()}, 2000);
-*/
+
 
 $("#transit-button").click(function(){
   if ($("#transit-button").hasClass('on') && ($('.mobility-button.on').length > 1)) {
