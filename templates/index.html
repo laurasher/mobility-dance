@@ -145,23 +145,21 @@
     }
     #loading-icon{
       margin-left: 40%;
-      margin-top: 40%;
+      margin-top: 60%;
       font-size: 20px;
       color: white;
-      display: none;
     }
   </style>
 </head>
 
 <body>
 <p id="title">The Social Distancing Dance</p>
-<text id='loading-icon'>Loading...</text>
 <div id="vis">
 <div id="mobility-buttons">
     <button id="transit-button" class="mobility-button">Transit</button>
     <button id="work-button" class="mobility-button on">Work</button>
     <button id="residential-button" class="mobility-button">Residential</button>
-    <button id="grocery-button" class="mobility-button on">Grocery</button>
+    <button id="grocery-button" class="mobility-button">Grocery</button>
     <button id="retail-button" class="mobility-button">Retail</button>
     <button id="parks-button" class="mobility-button">Parks</button>
 </div>
@@ -171,18 +169,22 @@
 </div>
 <div id="play-button-container">
   <button id="play-button">Play</button>
+<text id='loading-icon'>Loading...</text>
 </div>
 </div>
 <div id="stay-at-home">
 </div>
 <script>
-/*
+
 function loadingFade() {           
   $('#loading-icon').animate({opacity:'1'}, 500);
   $('#loading-icon').animate({opacity:'0.4'}, 500, loadingFade);
 }
+
 loadingFade();
-*/
+
+setTimeout(function(){$('#loading-icon').remove()}, 2000);
+
 
 $("#transit-button").click(function(){
   if ($("#transit-button").hasClass('on') && ($('.mobility-button.on').length > 1)) {
@@ -326,7 +328,7 @@ var label = slider.append("text")
 
 var dataset;
 var stay_at_home = []
-
+var state_opacity = 0.6
 d3.csv('./static/stay_at_home.csv', function(data) {
     for (var i = 0; i < data.length; i++) {
         stay_at_home.push({ 'state': data[i].state,
@@ -338,7 +340,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
     slider.insert("g", ".track-overlay")
       .attr("class", "ticks-lines")
       .attr("transform", "translate(0," + 1 + ")")
-      .style("opacity", 0.8)
+      .style("opacity", state_opacity)
     .selectAll("circle")
       .data(stay_at_home.map(x=>new Date(x.order_date)))
       .enter()
@@ -346,7 +348,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .attr("cx", x_slider)
       .attr("cy", 10)
       .attr("r", 2)
-      .style("opacity", 0.8)
+      .style("opacity", state_opacity)
       .style("fill", "white")
       .attr("text-anchor", "middle")
       //.text(function(d) { return formatDate(d); });
@@ -363,7 +365,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .attr("font-size", "7px")
       .style("fill", "white")
       .attr("text-anchor", "middle")
-      .style("opacity", 0.8)
+      .style("opacity", state_opacity)
       .text(function(d, i) { return stay_at_home[i].stabr; });
 });
 
