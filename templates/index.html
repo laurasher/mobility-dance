@@ -19,11 +19,9 @@
     #play-button {
       margin-left: 80px;
       margin-top: 10px;
-      /*background: gray;*/
       background: black;
       padding-right: 26px;
       border-radius: 3px;
-      border: none;
       color: white;
       margin: 0;
       padding: 0 12px;
@@ -55,7 +53,8 @@
     }
 
     .mobility-button:hover {
-      background-color: #696969;
+      background-color: lightgray;
+      color: black;
     } 
     .mobility-button:focus {
       outline:none;
@@ -70,7 +69,8 @@
     }
 
     #play-button:hover {
-      background-color: #696969;
+      background-color: lightgray;
+      color: black;
     }  
     #play-button:focus {
       outline:none;
@@ -134,7 +134,7 @@
 
     }
     #play-button-container{
-      margin-top: 20px;
+      margin-top: 50px;
       margin-left: 100px;
     }
     #text{
@@ -149,6 +149,19 @@
       font-size: 20px;
       color: white;
     }
+    #state-selector{
+      float: left;
+      margin-left: 100px;
+      margin-top: 10px;
+      background: black;
+      color: white;
+      border: solid;
+      border-color: white;
+      border-width: thin !important;
+    }
+    #state-selector:focus {
+      outline:none;
+
   </style>
 </head>
 
@@ -168,11 +181,65 @@
   Each point represents one U.S. county. Its height corresponds to change in mobility from baseline.<br>
   Select one or more mobility categories to include in the displayed average.
 </div>
+<div>
+<select name="state-select" id="state-selector">
+    <option value="all">Show all states</option>
+    <option value="Alabama">Alabama</option>
+    <option value="Alaska">Alaska</option>
+    <option value="Arizona">Arizona</option>
+    <option value="Arkansas">Arkansas</option>
+    <option value="California">California</option>
+    <option value="Colorado">Colorado</option>
+    <option value="Connecticut">Connecticut</option>
+    <option value="Delaware">Delaware</option>
+    <option value="Florida">Florida</option>
+    <option value="Georgia">Georgia</option>
+    <option value="Hawaii">Hawaii</option>
+    <option value="Idaho">Idaho</option>
+    <option value="Illinois">Illinois</option>
+    <option value="Indiana">Indiana</option>
+    <option value="Iowa">Iowa</option>
+    <option value="Kansas">Kansas</option>
+    <option value="Kentucky">Kentucky</option>
+    <option value="Louisiana">Louisiana</option>
+    <option value="Maine">Maine</option>
+    <option value="Maryland">Maryland</option>
+    <option value="Massachusetts">Massachusetts</option>
+    <option value="Michigan">Michigan</option>
+    <option value="Minnesota">Minnesota</option>
+    <option value="Mississippi">Mississippi</option>
+    <option value="Missouri">Missouri</option>
+    <option value="Montana">Montana</option>
+    <option value="Nebraska">Nebraska</option>
+    <option value="Nevada">Nevada</option>
+    <option value="New-Hampshire">New Hampshire</option>
+    <option value="New-Jersey">New Jersey</option>
+    <option value="New-Mexico">New Mexico</option>
+    <option value="New-York">New York</option>
+    <option value="North-Carolina">North Carolina</option>
+    <option value="North-Dakota">North Dakota</option>
+    <option value="Ohio">Ohio</option>
+    <option value="Oklahoma">Oklahoma</option>
+    <option value="Oregon">Oregon</option>
+    <option value="Pennsylvania">Pennsylvania</option>
+    <option value="Rhode-Island">Rhode Island</option>
+    <option value="South-Carolina">South Carolina</option>
+    <option value="South-Dakota">South Dakota</option>
+    <option value="Tennessee">Tennessee</option>
+    <option value="Texas">Texas</option>
+    <option value="Utah">Utah</option>
+    <option value="Vermont">Vermont</option>
+    <option value="Virginia">Virginia</option>
+    <option value="Washington">Washington</option>
+    <option value="West-Virginia">West Virginia</option>
+    <option value="Wisconsin">Wisconsin</option>
+    <option value="Wyoming">Wyoming</option>
+</select>
+</div>
 <div id="play-button-container">
   <button id="play-button">Play</button>
+</div>
 <text id='loading-icon'>Loading...</text>
-</div>
-</div>
 <div id="stay-at-home">
 </div>
 <script>
@@ -364,17 +431,27 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .append("text")
       .attr("x", x_slider)
       .attr("y", function(d, i) { return 10 + 10*stay_at_home[i].offset; })
-      .attr("font-size", "7px")
+      .attr("font-size", "8px")
       //.style("fill", "white")
       .attr("fill", function(d, i) { return stay_at_home[i].color; })
       .attr("text-anchor", "middle")
       .style("opacity", state_opacity)
       .text(function(d, i) { return stay_at_home[i].stabr; });
 });
+  
+  $("#state-selector").change(function() {
+    console.log("CHANGE STATE")
+    console.log($("#state-selector").val())
+    plot.selectAll(".scatterdot")
+      .attr("opacity", 0.2)
+    plot.selectAll("."+$("#state-selector").val())
+      .attr("opacity", 1)
 
-ploty = margin.top + height/3.5
+  });
 
-var plot = svg.append("g")
+  ploty = margin.top + height/3.5
+
+  var plot = svg.append("g")
     .attr("class", "plot")
     .attr("transform", "translate(" + margin.left + "," + ploty + ")");
   
@@ -387,9 +464,6 @@ var plot = svg.append("g")
     data_filt = data_filt.filter(x => x.sub_region_1 != '')
     data_filt = data_filt.filter(x => x.sub_region_2 != '')
     data_filt = data_filt.filter(x => x.date==dates[date_ind])
-    //data_filt = _.sortBy(data_filt, 'sub_region_1')
-    //console.log(data_filt)
-    //console.log(stay_at_home)
 
     data_obj = data_filt.map( function (x) {
         if (x.retail_and_recreation_percent_change_from_baseline == ""){
@@ -427,21 +501,9 @@ var plot = svg.append("g")
 
         avg_mobility_change = total / avg_mobility_change.length
         
-        //console.log("Manual with buttons ", avg_mobility_change)
-        /*
-        avg_mobility_change = (
-                 parseInt(x.retail_and_recreation_percent_change_from_baseline) + 
-                 parseInt(x.grocery_and_pharmacy_percent_change_from_baseline) +
-                 parseInt(x.parks_percent_change_from_baseline) + 
-                 parseInt(x.transit_stations_percent_change_from_baseline) + 
-                 parseInt(x.workplaces_percent_change_from_baseline) +
-                 parseInt(x.residential_percent_change_from_baseline)) / 6;
-        */
-        //console.log("Old way ", avg_mobility_change)
-
         // Northeast
         if (  ['Maine', 'Massachusetts', 'Rhode Island', 'Connecticut', 'New Hampshire', 'Vermont', 
-          'New York', 'Pennsylvania', 'New Jersey', 'Delaware', 'Maryland'].includes(x.sub_region_1) ){
+          'New York', 'Pennsylvania', 'New Jersey', 'Delaware', 'Maryland', 'District of Columbia'].includes(x.sub_region_1) ){
           //region = '#948718';
           region = '#7fa998'
           //region = 'red'
@@ -476,7 +538,8 @@ var plot = svg.append("g")
           region = "#69b3a2";
         }
         return  {'change': avg_mobility_change,
-                 'region': region}
+                 'region': region,
+                 'state': x.sub_region_1.replace(" ","-")}
       })
       data_obj = _.sortBy(data_obj, 'region')
       //console.log(data_obj)
@@ -510,7 +573,8 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
     .append("circle")
     .attr("class", "scatterdot")
     .attr("r", 1.5)
-    .style("fill", function (d) { return d.region; })*/
+    .style("fill", function (d) { return d.region; })
+  */
 
   //update all circles to new positions
   dots.transition()
@@ -563,17 +627,19 @@ function drawPlot(dataset) {
     .data(dataset);
 
   // if filtered dataset has less circles than already existing, remove excess
-  dots.exit()
-    .remove();
+  /*dots.exit()
+    .remove();*/
 
   // if filtered dataset has more circles than already existing, transition new ones in
+  console.log($('#state-selector').val())
   dots.enter()
     .append("circle")
-    .attr("class", "scatterdot")
+    .attr("class", function (d) { return ("scatterdot "+d.state); })
     .attr("r", 1.5)
     .attr("cx", function (d, i) { return x_dots(i); } )
     .attr("cy", function (d) { return y(d.change); } )
     //.style("fill", "#69b3a2")
+    //.style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
     .style("fill", function (d) { return d.region; })
 
   //update all circles to new positions
@@ -590,6 +656,11 @@ function drawPlot(dataset) {
 
 function update(h) {
   console.log('UPDATE')
+  plot.selectAll(".West-Virginia")
+    .style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
+  plot.selectAll(".Virginia")
+    .style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
+
   // update position and text of label according to slider scale
   handle.attr("cx", x_slider(h));
   label
@@ -614,6 +685,8 @@ function drawStayAtHomeDiv(state){
   txt3.innerHTML = "Text.";
   $('#stay-at-home').append(txt3);  
 }
+
+
 
 </script>
 </body>
