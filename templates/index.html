@@ -284,7 +284,7 @@ function loadingFade() {
 
 loadingFade();
 
-setTimeout(function(){$('#loading-icon').remove()}, 2000);
+setTimeout(function(){$('#loading-icon').remove()}, 3000);
 
 
 $("#transit-button").click(function(){
@@ -479,11 +479,19 @@ d3.csv('./static/stay_at_home.csv', function(data) {
 });
   
   $("#state-selector").change(function() {
-    plot.selectAll(".scatterdot")
-      .attr("opacity", 0.2)
-    plot.selectAll("."+$("#state-selector").val())
-      .attr("opacity", 1)
-
+    if ($('#state-selector').val() != "all"){
+      //console.log("SHOW ", $("#state-selector").val())
+      plot.selectAll(".scatterdot")
+        .style("opacity", 0.2)
+      plot.selectAll("."+$("#state-selector").val())
+        .style("opacity", 1)
+    }
+    else if ($('#state-selector').val() == "all"){
+      //console.log('SHOW ALL')
+      plot.selectAll(".scatterdot")
+        .style("opacity", 1)
+    }
+    else{}
   });
 
   ploty = margin.top + height/3.5
@@ -493,6 +501,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
     .attr("transform", "translate(" + margin.left + "," + ploty + ")");
   
   function filter_data(_date, data){
+    // Returns data for a certain data
     region = "#69b3a2";
     _date = formatDate(_date).toString()
     dates = _.uniq(data.map(x=>x.date))
@@ -541,36 +550,26 @@ d3.csv('./static/stay_at_home.csv', function(data) {
         // Northeast
         if (  ['Maine', 'Massachusetts', 'Rhode Island', 'Connecticut', 'New Hampshire', 'Vermont', 
           'New York', 'Pennsylvania', 'New Jersey', 'Delaware', 'Maryland', 'District of Columbia'].includes(x.sub_region_1) ){
-          //region = '#948718';
           region = '#7fa998'
-          //region = 'red'
         }
         // Southeast
         else if (  ['West Virginia', 'Virginia', 'Kentucky', 'Tennessee', 'North Carolina', 'South Carolina', 'Georgia', 
           'Alabama', 'Mississippi', 'Arkansas', 'Louisiana', 'Florida'].includes(x.sub_region_1) ){
-          //region = '#948C43';
           region = '#f1f1b0'
-          //region = 'blue'
         } 
         // West
         else if (  ['Colorado', 'Wyoming', 'Montana', 'Idaho', 'Washington', 'Oregon', 'Utah', 'Nevada', 
           'California', 'Alaska', 'Hawaii'].includes(x.sub_region_1) ){
-          //region = '#948E57';
         region = '#a59f63'
-          //region = 'green'
         }
         // Midwest
         else if (  ['Ohio', 'Indiana', 'Michigan', 'Illinois', 'Missouri', 'Wisconsin', 'Minnesota', 'Iowa', 
           'Kansas', 'Nebraska', 'South Dakota', 'North Dakota'].includes(x.sub_region_1) ){
-          //region = '#94906C';
           region = '#df8543'
-          //region = 'purple'
         }
         // Southwest
         else if (  ['Texas', 'Oklahoma', 'New Mexico', 'Arizona'].includes(x.sub_region_1) ){
-          //region = '#94927E';
           region = '#9d2503'
-          //region = 'white'
 
         } else {
           region = "#69b3a2";
@@ -578,20 +577,18 @@ d3.csv('./static/stay_at_home.csv', function(data) {
         return  {'change': avg_mobility_change,
                  'region': region,
                  'state': x.sub_region_1.replace(" ","-"),
-                 'county' : x.sub_region_2}
+                 'county' : x.sub_region_2,
+                 'date' : x.date}
       })
       data_obj = _.sortBy(data_obj, 'region')
       return data_obj
   }
 
 d3.csv("./static/Global_Mobility_Report.csv", function(data) {
+
   dataset = data;
 
-  //data_filt = filter_data(0, dataset)
-  data_filt = filter_data(new Date('2020-02-18'), dataset)
-
-  var d1 = {date:"30-Apr-12",close:"53.98"};
-  var d2 = {date:"26-Apr-12",close:"89.70"};
+  data_filt = filter_data(new Date('2020-02-14'), dataset)
 
   plot.append("line")
    .attr('stroke', 'white')
@@ -621,6 +618,7 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
         .transition()
         .attr("r", 1.5);
   */
+
   drawPlot(data_filt);
   
   playButton
@@ -654,6 +652,8 @@ function step() {
 }
 
 function drawPlot(dataset) {
+  //console.log("DATA IN DRAW PLOT")
+  //console.log(dataset)
   var dots = plot.selectAll(".scatterdot")
     .data(dataset);
 
@@ -669,7 +669,7 @@ function drawPlot(dataset) {
     .attr("cx", function (d, i) { return x_dots(i); } )
     .attr("cy", function (d) { return y(d.change); } )
     //.style("fill", "#69b3a2")
-    //.style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
+    .attr("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
     .style("fill", function (d) { return d.region; })
     .on("mouseover", function(d) {    
             div.transition()    
@@ -698,13 +698,21 @@ function drawPlot(dataset) {
 }
 
 function update(h) {
-  if ( ($('#state-selector').val() != "West-Virginia") && (!$('#state-selector').val() != "all") ){
+  //console.log("UPDATE")
+  if ($('#state-selector').val() != "West-Virginia"){
+    //console.log("Don't show west virginia")
     plot.selectAll(".scatterdot.West-Virginia")
-      .style("opacity", 0.2)
+      .attr("opacity", 0.2)
   }
-  if ( ($('#state-selector').val() != "Virginia") && (!$('#state-selector').val() != "all") ){
+  if ($('#state-selector').val() != "Virginia"){
+    //console.log("Don't show  virginia")
     plot.selectAll(".scatterdot.Virginia")
-      .style("opacity", 0.2)
+      .attr("opacity", 0.2)
+  }
+  if ($('#state-selector').val() == "all"){
+    //console.log("SHOW ALL STATES")
+    plot.selectAll(".scatterdot")
+      .style("opacity", 1)
   }
   // update position and text of label according to slider scale
   handle.attr("cx", x_slider(h));
