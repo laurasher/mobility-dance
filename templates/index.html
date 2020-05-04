@@ -155,7 +155,7 @@
       /*margin-top: 20px;*/
     }
     #loading-icon{
-      margin-left: 40%;
+      margin-left: 45%;
       margin-top: 60%;
       font-size: 20px;
       color: white;
@@ -185,7 +185,15 @@
     pointer-events: none;
     text-align: center;
     vertical-align: center;    
-}
+  }
+  .county-line {
+    stroke: white;
+    stroke-width: 1px;
+    opacity: 0;
+  }
+  .scatterdot{
+    /*display: none;*/
+  }
   </style>
 </head>
 
@@ -224,6 +232,7 @@
     <option value="Colorado">Colorado</option>
     <option value="Connecticut">Connecticut</option>
     <option value="Delaware">Delaware</option>
+    <option value="Delaware">District of Columbia</option>
     <option value="Florida">Florida</option>
     <option value="Georgia">Georgia</option>
     <option value="Hawaii">Hawaii</option>
@@ -332,9 +341,8 @@ $("#parks-button").click(function(){
 
 var states_with_orders = []
 
-var formatDateIntoYear = d3.timeFormat("%Y");
-//var formatDate = d3.timeFormat("%m/%d/%y");
 var formatDate = d3.timeFormat("%m/%d/%y");
+var parseTime = d3.timeParse("%m/%d/%y");
 
 var startDate = new Date("2020-02-15"),
     endDate = new Date("2020-04-11");
@@ -499,7 +507,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
     .attr("transform", "translate(" + margin.left + "," + ploty + ")");
   
   function filter_data(_date, data){
-    // Returns data for a certain data
+    // Returns data for a certain date
     region = "#69b3a2";
     _date = formatDate(_date).toString()
     dates = _.uniq(data.map(x=>x.date))
@@ -576,7 +584,90 @@ d3.csv('./static/stay_at_home.csv', function(data) {
                  'state': x.sub_region_1.replace(" ","-"),
                  'county' : x.sub_region_2,
                  'date' : x.date,
-                 'key' : x.sub_region_2+"-"+x.sub_region_1}
+                 //'key' : x.sub_region_2+"-"+x.sub_region_1
+                 'key' : x.sub_region_2.replace(" ","-").replace(" ","-")+"-"+x.sub_region_1.replace(" ","-")}
+      })
+      data_obj = _.sortBy(data_obj, 'region')
+      return data_obj
+      console.log(data_obj)
+  }
+
+  function filter_data_for_lines(data){
+    // Returns data by county for timeseries
+    region = "#69b3a2";
+    data_filt = data.filter(x => x.country_region == 'United States')
+    data_filt = data_filt.filter(x => x.sub_region_1 != '')
+    data_filt = data_filt.filter(x => x.sub_region_2 != '')
+
+    data_obj = data_filt.map( function (x) {
+        if (x.retail_and_recreation_percent_change_from_baseline == ""){
+            x.retail_and_recreation_percent_change_from_baseline = 0
+        }
+        if (x.grocery_and_pharmacy_percent_change_from_baseline == ""){
+            x.grocery_and_pharmacy_percent_change_from_baseline = 0
+        }
+        if (x.parks_percent_change_from_baseline == ""){
+            x.parks_percent_change_from_baseline = 0
+        }
+        if (x.transit_stations_percent_change_from_baseline == ""){
+            x.transit_stations_percent_change_from_baseline = 0
+        }
+        if (x.workplaces_percent_change_from_baseline == ""){
+            x.workplaces_percent_change_from_baseline = 0
+        }
+        if (x.residential_percent_change_from_baseline == ""){
+            x.residential_percent_change_from_baseline = 0
+        }
+
+        
+        avg_mobility_change = []
+        avg_mobility_change.push(x.transit_stations_percent_change_from_baseline)
+        avg_mobility_change.push(x.workplaces_percent_change_from_baseline)
+        avg_mobility_change.push(x.residential_percent_change_from_baseline)
+        avg_mobility_change.push(x.grocery_and_pharmacy_percent_change_from_baseline)
+        avg_mobility_change.push(x.retail_and_recreation_percent_change_from_baseline)
+        avg_mobility_change.push(x.parks_percent_change_from_baseline)
+
+        var total = 0
+        avg_mobility_change.forEach(function (x) {
+            total += parseInt(x)        
+        });
+
+        avg_mobility_change = total / avg_mobility_change.length
+        
+        // Northeast
+        if (  ['Maine', 'Massachusetts', 'Rhode Island', 'Connecticut', 'New Hampshire', 'Vermont', 
+          'New York', 'Pennsylvania', 'New Jersey', 'Delaware', 'Maryland', 'District of Columbia'].includes(x.sub_region_1) ){
+          region = '#7fa998'
+        }
+        // Southeast
+        else if (  ['West Virginia', 'Virginia', 'Kentucky', 'Tennessee', 'North Carolina', 'South Carolina', 'Georgia', 
+          'Alabama', 'Mississippi', 'Arkansas', 'Louisiana', 'Florida'].includes(x.sub_region_1) ){
+          region = '#f1f1b0'
+        } 
+        // West
+        else if (  ['Colorado', 'Wyoming', 'Montana', 'Idaho', 'Washington', 'Oregon', 'Utah', 'Nevada', 
+          'California', 'Alaska', 'Hawaii'].includes(x.sub_region_1) ){
+        region = '#a59f63'
+        }
+        // Midwest
+        else if (  ['Ohio', 'Indiana', 'Michigan', 'Illinois', 'Missouri', 'Wisconsin', 'Minnesota', 'Iowa', 
+          'Kansas', 'Nebraska', 'South Dakota', 'North Dakota'].includes(x.sub_region_1) ){
+          region = '#df8543'
+        }
+        // Southwest
+        else if (  ['Texas', 'Oklahoma', 'New Mexico', 'Arizona'].includes(x.sub_region_1) ){
+          region = '#9d2503'
+
+        } else {
+          region = "#69b3a2";
+        }
+        return  {'change': avg_mobility_change,
+                 'region': region,
+                 'state': x.sub_region_1.replace(" ","-"),
+                 'county' : x.sub_region_2,
+                 'date' : parseTime(x.date),
+                 'key' : x.sub_region_2.replace(" ","-").replace(" ","-")+"-"+x.sub_region_1.replace(" ","-")}
       })
       data_obj = _.sortBy(data_obj, 'region')
       return data_obj
@@ -587,6 +678,24 @@ function key (d) { return d.key; }
 d3.csv("./static/Global_Mobility_Report.csv", function(data) {
   dataset = data;
 
+  data_for_lines = filter_data_for_lines(data)
+
+  var countyline = d3.line()
+    .x(function(d) { return x_slider(d.date); })
+    .y(function(d) { return y(d.change); })
+
+  counties = _.uniq(data_for_lines.map(x=>x.key))
+  for (i=0; i < counties.length; i++){
+    data_line = data_for_lines.filter(x => x.key == counties[i])
+    //console.log(counties[i])
+    plot.append("path")
+        .data([data_line])
+        .attr("class", function (d) { 
+          //console.log("*", d[0].key);
+          return ("county-line "+d[0].key); })
+        .style("stroke", [data_for_lines.filter(x => x.key == counties[i])[0].region])
+        .attr("d", countyline)
+  }
   data_filt = filter_data(new Date('2020-02-14'), dataset)
 
   plot.append("line")
@@ -599,7 +708,6 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
    .attr("x2", x_dots(2770))
    .attr("y2", y(0));
 
-  
   drawPlot(data_filt);
   
   playButton
@@ -637,11 +745,6 @@ function drawPlot(dataset) {
   //console.log(dataset)
   var dots = plot.selectAll(".scatterdot")
     .data(dataset, key);
-    //.data(dataset);
-
-  // if filtered dataset has less circles than already existing, remove excess
-  /*dots.exit()
-    .remove();*/
 
   // if filtered dataset has more circles than already existing, transition new ones in
   dots.enter()
@@ -652,9 +755,12 @@ function drawPlot(dataset) {
     .attr("cy", function (d) { return y(d.change); } )
     .attr("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
     .style("fill", function (d) { return d.region; })
-    .on("mouseover", function(d) {    
+    .on("mouseover", function(d) {
+            plot.selectAll(".county-line."+d.key) 
+              .style("opacity", .9)
+              .attr("opacity", .9);  
             div.transition()    
-                .duration(200)    
+                .duration(50)    
                 .style("opacity", .9);    
             div .html(d.county + ", " + d.state.replace("-", " "))  
                 .style("left", (d3.event.pageX) + "px")   
@@ -663,7 +769,12 @@ function drawPlot(dataset) {
         .on("mouseout", function(d) {   
             div.transition()    
                 .duration(500)    
-                .style("opacity", 0); 
+                .style("opacity", 0);
+            plot.selectAll(".county-line."+d.key)
+              .transition()    
+              .duration(800)    
+              .style("opacity", 0)
+              .attr("opacity", 0); 
         });
 
   //update all circles to new positions
