@@ -501,7 +501,6 @@ d3.csv('./static/stay_at_home.csv', function(data) {
     data_filt = data_filt.filter(x => x.sub_region_1 != '')
     data_filt = data_filt.filter(x => x.sub_region_2 != '')
     data_filt = data_filt.filter(x => x.date==dates[date_ind])
-    console.log(data_filt)
 
     data_obj = data_filt.map( function (x) {
         if (x.retail_and_recreation_percent_change_from_baseline == ""){
@@ -655,7 +654,6 @@ function step() {
 }
 
 function drawPlot(dataset) {
-  console.log(dataset)
   var dots = plot.selectAll(".scatterdot")
     .data(dataset);
 
@@ -701,13 +699,11 @@ function drawPlot(dataset) {
 
 function update(h) {
   if ( ($('#state-selector').val() != "West-Virginia") && (!$('#state-selector').val() != "all") ){
-    plot.selectAll(".scatterdot .West-Virginia")
-      //.style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
+    plot.selectAll(".scatterdot.West-Virginia")
       .style("opacity", 0.2)
   }
   if ( ($('#state-selector').val() != "Virginia") && (!$('#state-selector').val() != "all") ){
-    plot.selectAll(".scatterdot .Virginia")
-      //.style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
+    plot.selectAll(".scatterdot.Virginia")
       .style("opacity", 0.2)
   }
   // update position and text of label according to slider scale
