@@ -172,23 +172,36 @@
     }
     #state-selector:focus {
       outline:none;
-
+    }
+    div.tooltip { 
+    position: absolute;     
+    text-align: center;     
+    width: auto;          
+    height: auto;         
+    font: 12px sans-serif; 
+    color: black;   
+    background: white;
+    border: 0px;    
+    pointer-events: none;
+    text-align: center;
+    vertical-align: center;    
+}
   </style>
 </head>
 
 <body>
 <p id="title">The Social Distancing Dance</p>
 <div id="text">
-  <span style="font-size: 16px;">During this time of distance, take a moment to ponder the impact on your own life of decreased mobility from the place you call home.</span><br><br>
+  <span style="font-size: 16px;">During this time of physical distance, take a moment to ponder the impact on your own life of decreased mobility from the place you call home.</span><br><br>
   This data was created by 
-  <a style="font-size: 12px; color: white;" href="https://www.google.com/covid19/mobility/data_documentation.html">Google</a> by tracking movement of people through their mobile devices to different location categories.<br>
-  Each point represents one US county, color coded by 
+  <a style="font-size: 12px; color: white;" href="https://www.google.com/covid19/mobility/data_documentation.html">Google</a> by tracking movement of people to different location categories through their mobile devices.<br>
+  Each dot represents one US county, color coded by 
   <span style="color: #7fa998"><b>Northeast</b></span>,
   <span style="color: #f1f1b0"><b>Southeast</b></span>,
   <span style="color: #df8543"><b>Midwest</b></span>,
   <span style="color: #a59f63"><b>West</b></span>,
   <span style="color: #9d2503"><b>Southwest</b></span>.
-  The height of each county dot<br>corresponds to its relative change in mobility from that county's median mobility. Certain state's stay at home directives are indicated on the timeline.<br>
+  The height of each county dot<br>corresponds to relative change from that county's median mobility. Certain state's stay at home directives are indicated on the timeline.<br>
   <b>See where people still go during a pandemic by selecting a single category or multiple to create an average.</b> 
 </div>
 <div id="mobility-buttons">
@@ -271,7 +284,7 @@ function loadingFade() {
 
 loadingFade();
 
-setTimeout(function(){$('#loading-icon').remove()}, 3000);
+setTimeout(function(){$('#loading-icon').remove()}, 2000);
 
 
 $("#transit-button").click(function(){
@@ -326,9 +339,14 @@ var formatDate = d3.timeFormat("%Y-%m-%d");
 var startDate = new Date("2020-02-15"),
     endDate = new Date("2020-04-11");
 
-var margin = {top:100, right:50, bottom:0, left: 34},
+var margin = {top:80, right:50, bottom:0, left: 34},
     width = 1250 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
+
+// Define the div for the tooltip
+var div = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);
 
 var svg = d3.select("#vis")
     .append("svg")
@@ -483,6 +501,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
     data_filt = data_filt.filter(x => x.sub_region_1 != '')
     data_filt = data_filt.filter(x => x.sub_region_2 != '')
     data_filt = data_filt.filter(x => x.date==dates[date_ind])
+    console.log(data_filt)
 
     data_obj = data_filt.map( function (x) {
         if (x.retail_and_recreation_percent_change_from_baseline == ""){
@@ -559,7 +578,8 @@ d3.csv('./static/stay_at_home.csv', function(data) {
         }
         return  {'change': avg_mobility_change,
                  'region': region,
-                 'state': x.sub_region_1.replace(" ","-")}
+                 'state': x.sub_region_1.replace(" ","-"),
+                 'county' : x.sub_region_2}
       })
       data_obj = _.sortBy(data_obj, 'region')
       return data_obj
@@ -584,15 +604,9 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
    .attr("x2", x_dots(2770))
    .attr("y2", y(0));
 
+  /*
   var dots = plot.selectAll(".scatterdot")
     .data(dataset);
-  /*
-  dots.enter()
-    .append("circle")
-    .attr("class", "scatterdot")
-    .attr("r", 1.5)
-    .style("fill", function (d) { return d.region; })
-  */
 
   //update all circles to new positions
   dots.transition()
@@ -607,7 +621,7 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
       .attr("r", 3)
         .transition()
         .attr("r", 1.5);
-
+  */
   drawPlot(data_filt);
   
   playButton
@@ -641,6 +655,7 @@ function step() {
 }
 
 function drawPlot(dataset) {
+  console.log(dataset)
   var dots = plot.selectAll(".scatterdot")
     .data(dataset);
 
@@ -658,6 +673,19 @@ function drawPlot(dataset) {
     //.style("fill", "#69b3a2")
     //.style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
     .style("fill", function (d) { return d.region; })
+    .on("mouseover", function(d) {    
+            div.transition()    
+                .duration(200)    
+                .style("opacity", .9);    
+            div .html(d.county + ", " + d.state.replace("-", " "))  
+                .style("left", (d3.event.pageX) + "px")   
+                .style("top", (d3.event.pageY - 15) + "px");  
+            })          
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+        });
 
   //update all circles to new positions
   dots.transition()
