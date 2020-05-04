@@ -188,7 +188,7 @@
   }
   .county-line {
     stroke: white;
-    stroke-width: 1px;
+    stroke-width: 2px;
     opacity: 0;
   }
   .scatterdot{
@@ -768,7 +768,7 @@ function drawPlot(dataset) {
             })          
         .on("mouseout", function(d) {   
             div.transition()    
-                .duration(500)    
+                .duration(600)    
                 .style("opacity", 0);
             plot.selectAll(".county-line."+d.key)
               .transition()    
