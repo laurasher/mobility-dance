@@ -6,6 +6,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <style>
+    :root {
+      --left: 8%;
+      --leading: 1%;
+    }
+
     body {
       font-family:"avenir next", Arial, sans-serif;
       font-size: 12px;
@@ -17,20 +22,21 @@
       outline:none;
     }
     #play-button {
-      margin-left: 80px;
-      margin-top: 10px;
+      margin-left: var(--left);
+      margin-top: var(--leading);
       background: black;
       padding-right: 26px;
       border-radius: 3px;
       color: white;
       margin: 0;
       padding: 0 12px;
-      width: 60px;
+      width: 40px;
       cursor: pointer;
-      height: 30px;
+      height: 18px;
       border: solid;
       border-color: white;
       border-width: thin !important;
+      margin-left: var(--leading)
     }
 
     .mobility-button {
@@ -43,12 +49,12 @@
       color: white;
       margin: 0;
       padding: 0 12px;
-      width: 60px;
+      width: 10%;
       cursor: pointer;
       height: 30px;
       width: auto;
-      margin-left: 20px;
-      font-size: 10px;
+      margin-right: 20px;
+      font-size: auto;
       border-width: thin;
     }
 
@@ -114,35 +120,38 @@
     #title{
       font-size: 36px;
       font-family:"avenir next", Arial, sans-serif;
-      margin-left: 100px;
-      margin-bottom: 10px;
+      margin-left: var(--left);
+      margin-bottom: var(--leading);
     }
+    /*
     #stay-at-home{
       background: red;
       float: left;
       height: 300px;
       width: 250px;
       margin-left: 50px;
-      /*display: inline;*/
       display: none;
     }
+    */
     #vis{
       float: left;
       display: inline;
+      width: 100%;
+      margin-left: var(--left);
     }
     #mobility-buttons{
-      margin-left: 80px;
-
+      margin-left: var(--left);
     }
     #play-button-container{
-      margin-left: 100px;
-      margin-top: 10px;
+      margin-left: var(--left);
+      margin-top: var(--leading);
     }
     #text{
       color: white;
       display: inline-block;
-      margin-left: 100px;
-      margin-bottom: 10px;
+      margin-left: var(--left);
+      margin-bottom: var(--leading);
+      width: 1500px;
       /*margin-top: 20px;*/
     }
     #loading-icon{
@@ -153,8 +162,8 @@
     }
     #state-selector{
       float: left;
-      margin-left: 100px;
-      margin-top: 10px;
+      margin-left: var(--left);
+      margin-top: var(--leading);
       background: black;
       color: white;
       border: solid;
@@ -170,9 +179,17 @@
 <body>
 <p id="title">The Social Distancing Dance</p>
 <div id="text">
-<!--<img style="width: auto; height: 50px; opacity: 0.7; margin-left: 0px;" src="./static/states.svg" alt="">-->
-  Each point represents one U.S. county. Its height corresponds to change in mobility from baseline.<br>
-  Select one or more mobility categories to include in the displayed average.
+  <span style="font-size: 16px;">During this time of distance, take a moment to ponder the impact on your own life of decreased mobility from the place you call home.</span><br><br>
+  This data was created by 
+  <a style="font-size: 12px; color: white;" href="https://www.google.com/covid19/mobility/data_documentation.html">Google</a> by tracking movement of people through their mobile devices to different location categories.<br>
+  Each point represents one US county, color coded by 
+  <span style="color: #7fa998"><b>Northeast</b></span>,
+  <span style="color: #f1f1b0"><b>Southeast</b></span>,
+  <span style="color: #df8543"><b>Midwest</b></span>,
+  <span style="color: #a59f63"><b>West</b></span>,
+  <span style="color: #9d2503"><b>Southwest</b></span>.
+  The height of each county dot<br>corresponds to its relative change in mobility from that county's median mobility. Certain state's stay at home directives are indicated on the timeline.<br>
+  <b>See where people still go during a pandemic by selecting a single category or multiple to create an average.</b> 
 </div>
 <div id="mobility-buttons">
     <button id="transit-button" class="mobility-button">Transit</button>
@@ -238,9 +255,8 @@
     <option value="Wyoming">Wyoming</option>
 </select>
 </div>
-<br></br>
 <div id="play-button-container">
-  <button id="play-button">Play</button>
+  <button id="play-button">▶</button>
 </div>
 <text id='loading-icon'>Loading...</text>
 <div id="stay-at-home">
@@ -310,8 +326,8 @@ var formatDate = d3.timeFormat("%Y-%m-%d");
 var startDate = new Date("2020-02-15"),
     endDate = new Date("2020-04-11");
 
-var margin = {top:80, right:50, bottom:0, left:110},
-    width = 1000 - margin.left - margin.right,
+var margin = {top:100, right:50, bottom:0, left: 34},
+    width = 1250 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
 var svg = d3.select("#vis")
@@ -421,7 +437,8 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .attr("cx", x_slider)
       .attr("cy", 10)
       .attr("r", 2)
-      .style("opacity", 0.6)
+      //.style("opacity", 0.6)
+      .style("opacity", 1)
       .style("fill", "white")
       .attr("text-anchor", "middle")
       //.text(function(d) { return formatDate(d); });
@@ -444,8 +461,6 @@ d3.csv('./static/stay_at_home.csv', function(data) {
 });
   
   $("#state-selector").change(function() {
-    console.log("CHANGE STATE")
-    console.log($("#state-selector").val())
     plot.selectAll(".scatterdot")
       .attr("opacity", 0.2)
     plot.selectAll("."+$("#state-selector").val())
@@ -522,7 +537,8 @@ d3.csv('./static/stay_at_home.csv', function(data) {
         // West
         else if (  ['Colorado', 'Wyoming', 'Montana', 'Idaho', 'Washington', 'Oregon', 'Utah', 'Nevada', 
           'California', 'Alaska', 'Hawaii'].includes(x.sub_region_1) ){
-          region = '#948E57';
+          //region = '#948E57';
+        region = '#a59f63'
           //region = 'green'
         }
         // Midwest
@@ -546,7 +562,6 @@ d3.csv('./static/stay_at_home.csv', function(data) {
                  'state': x.sub_region_1.replace(" ","-")}
       })
       data_obj = _.sortBy(data_obj, 'region')
-      //console.log(data_obj)
       return data_obj
   }
 
@@ -555,7 +570,6 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
 
   //data_filt = filter_data(0, dataset)
   data_filt = filter_data(new Date('2020-02-18'), dataset)
-  console.log('------ DRAW FOR FIRST TIME')
 
   var d1 = {date:"30-Apr-12",close:"53.98"};
   var d2 = {date:"26-Apr-12",close:"89.70"};
@@ -599,15 +613,15 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
   playButton
     .on("click", function() {
     var button = d3.select(this);
-    if (button.text() == "Pause") {
+    if (button.text() == "❚❚") {
       moving = false;
       clearInterval(timer);
       // timer = 0;
-      button.text("Play");
+      button.text("▶");
     } else {
       moving = true;
       timer = setInterval(step, 100);
-      button.text("Pause");
+      button.text("❚❚");
     }
     console.log("Slider moving: " + moving);
   })
@@ -621,7 +635,7 @@ function step() {
     currentValue = 0;
     clearInterval(timer);
     // timer = 0;
-    playButton.text("Play");
+    playButton.text("▶");
     console.log("Slider moving: " + moving);
   }
 }
@@ -635,7 +649,6 @@ function drawPlot(dataset) {
     .remove();*/
 
   // if filtered dataset has more circles than already existing, transition new ones in
-  console.log($('#state-selector').val())
   dots.enter()
     .append("circle")
     .attr("class", function (d) { return ("scatterdot "+d.state); })
@@ -659,12 +672,16 @@ function drawPlot(dataset) {
 }
 
 function update(h) {
-  console.log('UPDATE')
-  plot.selectAll(".West-Virginia")
-    .style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
-  plot.selectAll(".Virginia")
-    .style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
-
+  if ( ($('#state-selector').val() != "West-Virginia") && (!$('#state-selector').val() != "all") ){
+    plot.selectAll(".scatterdot .West-Virginia")
+      //.style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
+      .style("opacity", 0.2)
+  }
+  if ( ($('#state-selector').val() != "Virginia") && (!$('#state-selector').val() != "all") ){
+    plot.selectAll(".scatterdot .Virginia")
+      //.style("opacity", function(d) { return ($('#state-selector').val().includes('all') ? 1 : 0.2); })
+      .style("opacity", 0.2)
+  }
   // update position and text of label according to slider scale
   handle.attr("cx", x_slider(h));
   label
