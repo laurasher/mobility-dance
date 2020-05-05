@@ -137,6 +137,7 @@
       float: left;
       display: inline;
       width: 100%;
+      margin-top: var(--leading);
       margin-left: var(--left);
     }
     #mobility-buttons{
@@ -188,7 +189,7 @@
   }
   .county-line {
     stroke: white;
-    stroke-width: 2px;
+    stroke-width: 1.2px;
     opacity: 0;
   }
   .scatterdot{
@@ -202,14 +203,14 @@
 <div id="text">
   <!--<span style="font-size: 16px;">During this time of physical distance, take a moment to ponder the impact on your own life of decreased mobility from the place you call home.</span><br><br>-->
   This data was created by 
-  <a style="font-size: 12px; color: white;" target="_blank"  href="https://www.google.com/covid19/mobility/data_documentation.html">Google</a> by tracking movement of people to different location categories through their mobile devices.<br>
+  <a style="font-size: 12px; color: white;" target="_blank"  href="https://www.google.com/covid19/mobility/data_documentation.html">Google</a> in 2020 by tracking movement of people to different location categories through their mobile devices.<br>
   Each dot represents one US county, color coded by 
   <span style="color: #7fa998"><b>Northeast</b></span>,
   <span style="color: #f1f1b0"><b>Southeast</b></span>,
   <span style="color: #df8543"><b>Midwest</b></span>,
   <span style="color: #a59f63"><b>West</b></span>,
-  <span style="color: #9d2503"><b>Southwest</b></span>. <b>Hover</b> to see the county's name.
-  The height of each <br>county dot corresponds to relative change from that county's median mobility. Certain states' stay at home directives are indicated on the timeline.<br>
+  <span style="color: #9d2503"><b>Southwest</b></span>. <b>Hover to see the county's name and mobility history.</b>
+  <br>The vertical position of each county dot corresponds to relative change from that county's median mobility. Certain states' stay at home directives and releases are indicated on the timeline.<br>
   <b>See where people still go during a pandemic by selecting a single category, or multiple to create an average.</b> 
 </div>
 <div id="mobility-buttons">
@@ -342,10 +343,11 @@ $("#parks-button").click(function(){
 var states_with_orders = []
 
 var formatDate = d3.timeFormat("%m/%d/%y");
+var formatDate_long = d3.timeFormat("%a, \n%B %-d");
 var parseTime = d3.timeParse("%m/%d/%y");
 
 var startDate = new Date("2020-02-15"),
-    endDate = new Date("2020-04-11");
+    endDate = new Date("2020-04-30");
 
 var margin = {top:80, right:50, bottom:0, left: 34},
     width = 1250 - margin.left - margin.right,
@@ -365,7 +367,7 @@ var svg = d3.select("#vis")
 
 var moving = false;
 var currentValue = 0;
-var targetValue = width;
+var targetValue = width - margin.right;
 
 var playButton = d3.select("#play-button");
 
@@ -390,7 +392,8 @@ var y = d3.scaleLinear()
   .domain([0, -50])
   .range([ 0, height/3]);
 svg.append("g")
-  //.call(d3.axisLeft(y));
+  .call(d3.axisLeft(y))
+  .style("stroke", "white");
 
 var slider = svg.append("g")
     .attr("class", "slider")
@@ -433,9 +436,10 @@ var handle = slider.insert("circle", ".track-overlay")
 var label = slider.append("text")  
     .attr("class", "label")
     .attr("text-anchor", "middle")
-    .text(formatDate(startDate))
+    //.text(formatDate(startDate))
+    .text(formatDate_long(startDate))
     .style("fill", "white")
-    .attr("transform", "translate(0," + (-25) + ")")
+    .attr("transform", "translate("+15+", "+ (-25) + ")")
 
  
 ////////// plot //////////
@@ -456,12 +460,14 @@ d3.csv('./static/stay_at_home.csv', function(data) {
       .attr("class", "ticks-lines")
       .attr("transform", "translate(0," + 1 + ")")
       .style("opacity", state_opacity)
+
     .selectAll("circle")
       .data(stay_at_home.map(x=>new Date(x.order_date)))
       .enter()
       .append("circle")
       .attr("cx", x_slider)
-      .attr("cy", 10)
+      //.attr("cy", 10)
+      .attr("cy",  function(d, i) { return stay_at_home[i].offset < 0 ? -10 : 10 })
       .attr("r", 2)
       //.style("opacity", 0.6)
       .style("opacity", 1)
@@ -675,7 +681,7 @@ d3.csv('./static/stay_at_home.csv', function(data) {
 
 function key (d) { return d.key; }
 
-d3.csv("./static/Global_Mobility_Report.csv", function(data) {
+d3.csv("./static/Global_Mobility_Report_5_1_20.csv", function(data) {
   dataset = data;
 
   data_for_lines = filter_data_for_lines(data)
@@ -685,13 +691,12 @@ d3.csv("./static/Global_Mobility_Report.csv", function(data) {
     .y(function(d) { return y(d.change); })
 
   counties = _.uniq(data_for_lines.map(x=>x.key))
-  for (i=0; i < counties.length; i++){
+  for (i=0; i < counties.length; i = i+4){
     data_line = data_for_lines.filter(x => x.key == counties[i])
     //console.log(counties[i])
     plot.append("path")
         .data([data_line])
         .attr("class", function (d) { 
-          //console.log("*", d[0].key);
           return ("county-line "+d[0].key); })
         .style("stroke", [data_for_lines.filter(x => x.key == counties[i])[0].region])
         .attr("d", countyline)
@@ -758,7 +763,7 @@ function drawPlot(dataset) {
     .on("mouseover", function(d) {
             plot.selectAll(".county-line."+d.key) 
               .style("opacity", .9)
-              .attr("opacity", .9);  
+              .attr("opacity", .9); 
             div.transition()    
                 .duration(50)    
                 .style("opacity", .9);    
@@ -774,13 +779,12 @@ function drawPlot(dataset) {
               .transition()    
               .duration(800)    
               .style("opacity", 0)
-              .attr("opacity", 0); 
+              .attr("opacity", 0);  
         });
 
   //update all circles to new positions
   dots.transition()
-    .duration(500)
-    //.attr("cx", function (d, i) { return x_dots(i); } )
+    .duration(400)
     .attr("cy", function (d) { return y(d.change); } )
     .style("fill", function (d) { return d.region; })
   
@@ -817,7 +821,8 @@ function update(h) {
   handle.attr("cx", x_slider(h));
   label
     .attr("x", x_slider(h))
-    .text(formatDate(h));
+    //.text(formatDate(h));
+    .text(formatDate_long(h));
 
   d = formatDate(h).toString()
 
