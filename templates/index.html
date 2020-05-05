@@ -209,7 +209,7 @@
   <span style="color: #f1f1b0"><b>Southeast</b></span>,
   <span style="color: #df8543"><b>Midwest</b></span>,
   <span style="color: #a59f63"><b>West</b></span>,
-  <span style="color: #9d2503"><b>Southwest</b></span>. <b>Hover to see the county's name and mobility history.</b>
+  <span style="color: #c42a03"><b>Southwest</b></span>. <b>Hover to see the county's name and mobility history.</b>
   <br>The vertical position of each county dot corresponds to relative change from that county's median mobility. Certain states' stay at home directives and releases are indicated on the timeline.<br>
   <b>See where people still go during a pandemic by selecting a single category, or multiple to create an average.</b> 
 </div>
@@ -580,7 +580,8 @@ d3.csv('./static/stay_at_home.csv', function(data) {
         }
         // Southwest
         else if (  ['Texas', 'Oklahoma', 'New Mexico', 'Arizona'].includes(x.sub_region_1) ){
-          region = '#9d2503'
+          //region = '#9d2503'
+          region = '#c42a03'
 
         } else {
           region = "#69b3a2";
@@ -762,7 +763,7 @@ function drawPlot(dataset) {
     .style("fill", function (d) { return d.region; })
     .on("mouseover", function(d) {
             d3.select(this)
-              .attr("r", 5);
+              .attr("r", 8);
             plot.selectAll(".county-line."+d.key) 
               .style("opacity", .9)
               .attr("opacity", .9); 
@@ -781,7 +782,7 @@ function drawPlot(dataset) {
                 .style("opacity", 0);
             plot.selectAll(".county-line."+d.key)
               .transition()    
-              .duration(1000)    
+              .duration(1500)    
               .style("opacity", 0)
               .attr("opacity", 0);  
         });
