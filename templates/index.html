@@ -7,13 +7,21 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <style>
     :root {
-      --left: 8%;
+      --left: 7%;
       --leading: 1%;
+      --leading-title: 3%;
+      --responsive-font-size: 0.7vw;
+      --responsive-font-size-title: 1.3vw;
+      --responsive-font-size-buttons: 0.65vw;
+      --responsive-container-width: 75%;
+      --mobility-button-height: 1.6vw;
+      --selector-button-height: 1.3vw;
     }
 
     body {
       font-family:"avenir next", Arial, sans-serif;
-      font-size: 12px;
+      /*font-size: 12px;*/
+      font-size: var(--responsive-font-size);
       color: white;
       background: black;
     }
@@ -30,15 +38,32 @@
       color: white;
       margin: 0;
       padding: 0 12px;
-      width: 40px;
+      /*width: 40px;*/
       cursor: pointer;
-      height: 18px;
+      /*height: 18px;*/
+      height: var(--selector-button-height);
+      font-size: var(--responsive-font-size-buttons);
       border: solid;
       border-color: white;
       border-width: thin !important;
       margin-left: var(--leading)
     }
 
+    #state-selector{
+      float: left;
+      /*margin-left: var(--left);*/
+      /*margin-top: var(--leading);*/
+      background: black;
+      color: white;
+      border: solid;
+      border-color: white;
+      font-size: var(--responsive-font-size-buttons);
+      border-width: thin !important;
+      height: var(--selector-button-height);
+    }
+    #state-selector:focus {
+      outline:none;
+    }
     .mobility-button {
       display: inline;
       float: left;
@@ -49,13 +74,12 @@
       color: white;
       margin: 0;
       padding: 0 12px;
-      width: 10%;
       cursor: pointer;
-      height: 30px;
+      height: var(--mobility-button-height);
       width: auto;
-      margin-right: 20px;
-      font-size: auto;
+      margin-right: 1.2vw;
       border-width: thin;
+      font-size: var(--responsive-font-size-buttons);
     }
 
     .mobility-button:hover {
@@ -118,26 +142,18 @@
       stroke-width: 1.25px;
     }
     #title{
-      font-size: 36px;
+      /*font-size: 36px;*/
+      font-size: var(--responsive-font-size-title);
       font-family:"avenir next", Arial, sans-serif;
       margin-left: var(--left);
       margin-bottom: var(--leading);
+      padding-top: var(--leading-title);
     }
-    /*
-    #stay-at-home{
-      background: red;
-      float: left;
-      height: 300px;
-      width: 250px;
-      margin-left: 50px;
-      display: none;
-    }
-    */
     #vis{
-      float: left;
-      display: inline;
-      width: 100%;
-      margin-top: var(--leading);
+      /*float: left;*/
+      display: block;
+      width: var(--responsive-container-width);
+      margin-top: var(--leading-title);
       margin-left: var(--left);
     }
     #mobility-buttons{
@@ -152,27 +168,15 @@
       display: inline-block;
       margin-left: var(--left);
       margin-bottom: var(--leading);
-      width: 1500px;
+      width: var(--responsive-container-width);
+      /*width: 1500px;*/
       /*margin-top: 20px;*/
     }
     #loading-icon{
-      margin-left: 45%;
+      margin-left: 40%;
       margin-top: 60%;
       font-size: 20px;
       color: white;
-    }
-    #state-selector{
-      float: left;
-      margin-left: var(--left);
-      margin-top: var(--leading);
-      background: black;
-      color: white;
-      border: solid;
-      border-color: white;
-      border-width: thin !important;
-    }
-    #state-selector:focus {
-      outline:none;
     }
     div.tooltip { 
       position: absolute;     
@@ -188,13 +192,11 @@
       vertical-align: center;    
   }
   .county-line {
-    stroke: white;
-    stroke-width: 1.8px;
-    opacity: 0;
+      stroke: white;
+      stroke-width: 1.8px;
+      opacity: 0;
   }
-  .scatterdot{
-    /*display: none;*/
-  }
+
   </style>
 </head>
 
@@ -203,7 +205,7 @@
 <div id="text">
   <!--<span style="font-size: 16px;">During this time of physical distance, take a moment to ponder the impact on your own life of decreased mobility from the place you call home.</span><br><br>-->
   This data was created by 
-  <a style="font-size: 12px; color: white;" target="_blank"  href="https://www.google.com/covid19/mobility/data_documentation.html">Google</a> in 2020 by tracking movement of people to different location categories through their mobile devices.<br>
+  <a style="font-size: var(--responsive-font-size); color: white;" target="_blank"  href="https://www.google.com/covid19/mobility/data_documentation.html">Google</a> in 2020 by tracking movement of people to different location categories through their mobile devices.<br>
   Each dot represents one US county, color coded by 
   <span style="color: #7fa998"><b>Northeast</b></span>,
   <span style="color: #f1f1b0"><b>Southeast</b></span>,
@@ -222,68 +224,64 @@
     <button id="parks-button" class="mobility-button">Parks</button>
 </div>
 <br></br>
-<div>
-<select name="state-select" id="state-selector">
-    <option value="all">Show all states</option>
-    <option value="Alabama">Alabama</option>
-    <option value="Alaska">Alaska</option>
-    <option value="Arizona">Arizona</option>
-    <option value="Arkansas">Arkansas</option>
-    <option value="California">California</option>
-    <option value="Colorado">Colorado</option>
-    <option value="Connecticut">Connecticut</option>
-    <option value="Delaware">Delaware</option>
-    <option value="Delaware">District of Columbia</option>
-    <option value="Florida">Florida</option>
-    <option value="Georgia">Georgia</option>
-    <option value="Hawaii">Hawaii</option>
-    <option value="Idaho">Idaho</option>
-    <option value="Illinois">Illinois</option>
-    <option value="Indiana">Indiana</option>
-    <option value="Iowa">Iowa</option>
-    <option value="Kansas">Kansas</option>
-    <option value="Kentucky">Kentucky</option>
-    <option value="Louisiana">Louisiana</option>
-    <option value="Maine">Maine</option>
-    <option value="Maryland">Maryland</option>
-    <option value="Massachusetts">Massachusetts</option>
-    <option value="Michigan">Michigan</option>
-    <option value="Minnesota">Minnesota</option>
-    <option value="Mississippi">Mississippi</option>
-    <option value="Missouri">Missouri</option>
-    <option value="Montana">Montana</option>
-    <option value="Nebraska">Nebraska</option>
-    <option value="Nevada">Nevada</option>
-    <option value="New-Hampshire">New Hampshire</option>
-    <option value="New-Jersey">New Jersey</option>
-    <option value="New-Mexico">New Mexico</option>
-    <option value="New-York">New York</option>
-    <option value="North-Carolina">North Carolina</option>
-    <option value="North-Dakota">North Dakota</option>
-    <option value="Ohio">Ohio</option>
-    <option value="Oklahoma">Oklahoma</option>
-    <option value="Oregon">Oregon</option>
-    <option value="Pennsylvania">Pennsylvania</option>
-    <option value="Rhode-Island">Rhode Island</option>
-    <option value="South-Carolina">South Carolina</option>
-    <option value="South-Dakota">South Dakota</option>
-    <option value="Tennessee">Tennessee</option>
-    <option value="Texas">Texas</option>
-    <option value="Utah">Utah</option>
-    <option value="Vermont">Vermont</option>
-    <option value="Virginia">Virginia</option>
-    <option value="Washington">Washington</option>
-    <option value="West-Virginia">West Virginia</option>
-    <option value="Wisconsin">Wisconsin</option>
-    <option value="Wyoming">Wyoming</option>
-</select>
-</div>
 <div id="play-button-container">
+  <select name="state-select" id="state-selector">
+      <option value="all">Show all states</option>
+      <option value="Alabama">Alabama</option>
+      <option value="Alaska">Alaska</option>
+      <option value="Arizona">Arizona</option>
+      <option value="Arkansas">Arkansas</option>
+      <option value="California">California</option>
+      <option value="Colorado">Colorado</option>
+      <option value="Connecticut">Connecticut</option>
+      <option value="Delaware">Delaware</option>
+      <option value="Delaware">District of Columbia</option>
+      <option value="Florida">Florida</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Hawaii">Hawaii</option>
+      <option value="Idaho">Idaho</option>
+      <option value="Illinois">Illinois</option>
+      <option value="Indiana">Indiana</option>
+      <option value="Iowa">Iowa</option>
+      <option value="Kansas">Kansas</option>
+      <option value="Kentucky">Kentucky</option>
+      <option value="Louisiana">Louisiana</option>
+      <option value="Maine">Maine</option>
+      <option value="Maryland">Maryland</option>
+      <option value="Massachusetts">Massachusetts</option>
+      <option value="Michigan">Michigan</option>
+      <option value="Minnesota">Minnesota</option>
+      <option value="Mississippi">Mississippi</option>
+      <option value="Missouri">Missouri</option>
+      <option value="Montana">Montana</option>
+      <option value="Nebraska">Nebraska</option>
+      <option value="Nevada">Nevada</option>
+      <option value="New-Hampshire">New Hampshire</option>
+      <option value="New-Jersey">New Jersey</option>
+      <option value="New-Mexico">New Mexico</option>
+      <option value="New-York">New York</option>
+      <option value="North-Carolina">North Carolina</option>
+      <option value="North-Dakota">North Dakota</option>
+      <option value="Ohio">Ohio</option>
+      <option value="Oklahoma">Oklahoma</option>
+      <option value="Oregon">Oregon</option>
+      <option value="Pennsylvania">Pennsylvania</option>
+      <option value="Rhode-Island">Rhode Island</option>
+      <option value="South-Carolina">South Carolina</option>
+      <option value="South-Dakota">South Dakota</option>
+      <option value="Tennessee">Tennessee</option>
+      <option value="Texas">Texas</option>
+      <option value="Utah">Utah</option>
+      <option value="Vermont">Vermont</option>
+      <option value="Virginia">Virginia</option>
+      <option value="Washington">Washington</option>
+      <option value="West-Virginia">West Virginia</option>
+      <option value="Wisconsin">Wisconsin</option>
+      <option value="Wyoming">Wyoming</option>
+  </select>
   <button id="play-button">▶</button>
 </div>
 <text id='loading-icon'>Loading...</text>
-<div id="stay-at-home">
-</div>
 <div id="vis"></div>
 <script>
 
@@ -353,6 +351,46 @@ var margin = {top:80, right:50, bottom:0, left: 34},
     width = 1250 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
+function responsivefy(svg) {
+  // container will be the DOM element
+  // that the svg is appended to
+  // we then measure the container
+  // and find its aspect ratio
+  const container = d3.select(svg.node().parentNode),
+      width = parseInt(svg.style('width'), 10),
+      height = parseInt(svg.style('height'), 10),
+      aspect = width / height;
+ 
+  // set viewBox attribute to the initial size
+  // control scaling with preserveAspectRatio
+  // resize svg on inital page load
+  svg.attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMinYMid')
+      .call(resize);
+ 
+  // add a listener so the chart will be resized
+  // when the window resizes
+  // multiple listeners for the same event type
+  // requires a namespace, i.e., 'click.foo'
+  // api docs: https://goo.gl/F3ZCFr
+  d3.select(window).on(
+      'resize.' + container.attr('id'), 
+      resize
+  );
+ 
+  // this is the code that resizes the chart
+  // it will be called on load
+  // and in response to window resizes
+  // gets the width of the container
+  // and resizes the svg to fill it
+  // while maintaining a consistent aspect ratio
+  function resize() {
+      const w = parseInt(container.style('width'));
+      svg.attr('width', w);
+      svg.attr('height', Math.round(w / aspect));
+  }
+}
+
 // Define the div for the tooltip
 var div = d3.select("body").append("div") 
     .attr("class", "tooltip")       
@@ -360,8 +398,9 @@ var div = d3.select("body").append("div")
 
 var svg = d3.select("#vis")
     .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom);  
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .call(responsivefy)
 
 ////////// slider //////////
 
