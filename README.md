@@ -1,3 +1,3 @@
 # mobility-dance
 
-https://dashboard.heroku.com/apps/the-mobility-dance
+https://the-social-distancing-dance.herokuapp.com/
